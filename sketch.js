@@ -1,5 +1,5 @@
-var truck, truckDrivingImage, truckCollidedImage;
-var tiger,tigerRunningImage, tigerStopingImg;
+var man, manRunningImage, manCollidedImage;
+var wolf,wolfWalkingImage, wolfStopingImg;
 var ground, groundImg;
 var invisibleGround;
 var obstaclesGroup, obstacle, obstacle1, obstacle2, obstacle3;
@@ -13,10 +13,10 @@ var life1, life2, life3, life4, life5, lifeImg1, lifeImg2, lifeImg3, lifeImg4, l
 var lifePoint = 5;
 
 function preload(){
-  truckDrivingImage = loadAnimation("Images/truckImg_1.png","Images/truckImg_2.png");
-  truckCollidedImage = loadImage("Images/truckImg_1.png");
-  tigerRunningImage = loadAnimation("Images/tigerImg_1.png","Images/tigerImg_2.png","Images/tigerImg_3.png","Images/tigerImg_4.png","Images/tigerImg_5.png","Images/tigerImg_6.png","Images/tigerImg_7.png","Images/tigerImg_8.png");
-  tigerStopingImage = loadImage("Images/tigerImg_2.png");
+  manRunningImage = loadAnimation("Images/runningMan1.jpg","Images/runningMan2.jpg","Images/runningMan3.jpg","Images/runningMan4.jpg","Images/runningMan5.jpg","Images/runningMan6.jpg",);
+  manCollidedImage = loadImage("Images/runningMan7.jpg");
+  wolfWalkingImage = loadAnimation("Images/wolf1.png","Images/wolf2.png","Images/wolf3.png","Images/wolf4.png","Images/wolf5.png","Images/wolf6.png",);
+  wolfStopingImage = loadImage("Images/wolf7.png",);
   groundImage = loadImage("Images/groundImg.png");
   obstacle1 = loadImage("Images/obstacleImg_1.png");
   obstacle2 = loadImage("Images/obstacleImg_2.png");
@@ -38,18 +38,21 @@ function setup() {
   ground.addImage("ground",groundImage);
   ground.scale = 2.1;
   
-  truck = createSprite(400,480,20,20);
-  truck.x = ground.x/1.2;
-  truck.y = ground.y*1.45;
-  truck.addAnimation("driving", truckDrivingImage);
-  truck.scale = 0.35;
+  man = createSprite(400,480,20,20);
+  man.x = ground.x/1.2;
+  man.y = ground.y*1.45;
+  man.addAnimation("running", manRunningImage);
+  man.scale = 1.5;
+  // man.debug = true;
+  // man.setCollider("rectangle",0,0,100,200);
   
-  tiger = createSprite(100,480,20,20);
-  tiger.x = ground.x/4;
-  tiger.y = ground.y*1.45;
-  tiger.addAnimation("running",tigerRunningImage);
-  tiger.scale = 0.5;
-  tiger.setCollider("rectangle",100,0,600,130);
+  wolf = createSprite(100,480,20,20);
+  wolf.x = ground.x/4;
+  wolf.y = ground.y*1.45;
+  wolf.addAnimation("walking",wolfWalkingImage);
+  wolf.scale = 1.5;
+  // wolf.debug = true;
+  // wolf.setCollider("rectangle",0,0,200,50);
   
   gameOver = createSprite(windowWidth/2,windowHeight/2-100);
   gameOver.addImage(gameOverImage);
@@ -59,8 +62,8 @@ function setup() {
   restart.addImage(restartImage);
   restart.visible = false;
   
-  invisibleGround = createSprite(width/2,windowHeight/1.5,windowWidth,10);
-  invisibleGround.y = ground.y*1.58
+  invisibleGround = createSprite(width/2,windowHeight/3,windowWidth,10);
+  invisibleGround.y = ground.y+230;
   invisibleGround.visible = false;
 
   life1 = createSprite(100,100);
@@ -89,70 +92,69 @@ function setup() {
 function draw() {
   background(218,214,172);
   
-  // camera.position.x = truck.x;
-  camera.position.y = truck.y;
+  // camera.position.x = man.x;
+  camera.position.y = man.y;
 
-  life1.x = truck.x-60;
-  life1.y = truck.y-80;
+  life1.x = man.x-10;
+  life1.y = man.y-80;
 
-  life2.x = truck.x-35;
-  life2.y = truck.y-80;
+  life2.x = man.x+10;
+  life2.y = man.y-80;
 
-  life3.x = truck.x-10;
-  life3.y = truck.y-80;
+  life3.x = man.x+30;
+  life3.y = man.y-80;
 
-  life4.x = truck.x+15;
-  life4.y = truck.y-80;
+  life4.x = man.x+50;
+  life4.y = man.y-80;
 
-  life5.x = truck.x+40;
-  life5.y = truck.y-80;
+  life5.x = man.x+70;
+  life5.y = man.y-80;
   
   if(gameState===PLAY){
     
     score = score + Math.round(getFrameRate()/60);
     ground.velocityX = -(8 + 3*score/150);
     
-    if(keyDown("space") && truck.collide(invisibleGround)) {
-      truck.velocityY = -23;
+    if(keyDown("space") && man.collide(invisibleGround)) {
+      man.velocityY = -23;
     }
-    if(obstaclesGroup.isTouching(tiger)){
-      tiger.velocityY = -20;
+    if(obstaclesGroup.isTouching(wolf)){
+      wolf.velocityY = -20;
     }
-    truck.velocityY = truck.velocityY + 1;
-    tiger.velocityY = tiger.velocityY + 1;
-    tiger.x = windowWidth/7;
+    man.velocityY = man.velocityY + 1;
+    wolf.velocityY = wolf.velocityY + 1;
+    wolf.x = windowWidth/7;
     
-    if (ground.x < 0){
-      ground.x = width;
+    if (ground.x < 780){
+      ground.x = width-780;
     }
     
     createObstacles();
-    if(obstaclesGroup.isTouching(truck)){
+    if(obstaclesGroup.isTouching(man)){
       lifePoint -= 1;
+      obstaclesGroup.destroyEach();
     }
     
     if(lifePoint===4){
       life5.visible = false;
-      obstaclesGroup.destroyEach();
     }
     if(lifePoint===3){
       life4.visible = false;
-      obstaclesGroup.destroyEach();
     }
     
     if(lifePoint===2){
       life3.visible = false;
-      obstaclesGroup.destroyEach();
     }
     
     if(lifePoint===1){
       life2.visible = false;
-      obstaclesGroup.destroyEach();
     }
     
     if(lifePoint===0){
       life1.visible = false;
       gameState = END;
+      console.log("Game Over!");
+      console.log("Click 'Restart' to restart the game");
     }
     
   }
@@ -161,29 +163,29 @@ function draw() {
     restart.visible = true;
     
     ground.velocityX = 0;
-    truck.velocityY = 0;
-    tiger.velocityY = 0;
+    man.velocityY = 0;
+    wolf.velocityY = 0;
     obstaclesGroup.setVelocityXEach(0);
-    truck.addImage("truckCollided",truckCollidedImage);
-    truck.changeImage("truckCollided");
-    tiger.addImage("tigerStop",tigerStopingImage);
-    tiger.changeImage("tigerStop");
-    tiger.x = truck.x-70;
-    tiger.y = truck.y;
+    man.addImage("manCollided",manCollidedImage);
+    man.changeImage("manCollided");
+    wolf.addImage("wolfStop",wolfStopingImage);
+    wolf.changeImage("wolfStop");
+    wolf.x = man.x-70;
+    wolf.y = man.y;
     obstaclesGroup.setLifetimeEach(-1);
     if(mousePressedOver(restart)){
       reset();
     }
   }
   
-  console.log(lifePoint);
-  truck.collide(invisibleGround);
-  tiger.collide(invisibleGround);
+  console.log(lifePoint + " Heart left");
+  man.collide(invisibleGround);
+  wolf.collide(invisibleGround);
   drawSprites();
   textSize(20);
   fill(0);
   text("Score: "+ score,windowWidth/2,windowHeight/15);
-  text("Press 'Space' key to jump the Truck",windowWidth/2,windowHeight/30);
+  text("Press 'Space' key to jump Man",windowWidth/2,windowHeight/30);
 }
 
 function createObstacles() {
@@ -214,12 +216,12 @@ function reset(){
   gameState = PLAY;
   gameOver.visible = false;
   restart.visible = false;
-  tiger.x = ground.x/4;
+  wolf.x = ground.x/4;
   
   obstaclesGroup.destroyEach();
   
-  truck.changeAnimation("driving");
-  tiger.changeAnimation("running");
+  man.changeAnimation("running");
+  wolf.changeAnimation("walking");
   score = 0;
   lifePoint = 5;
   life1.visible = true;
@@ -227,4 +229,5 @@ function reset(){
   life3.visible = true;
   life4.visible = true;
   life5.visible = true;
+  console.log("Game Restarted!");
 }
